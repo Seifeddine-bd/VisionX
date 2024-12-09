@@ -1,4 +1,4 @@
-#  VisionX
+# VisionX
 
 A user-friendly Python application for performing various image processing tasks, including face detection, image manipulation, and camera-based operations, all through a graphical user interface (GUI) built with `Tkinter`.
 
@@ -10,6 +10,7 @@ A user-friendly Python application for performing various image processing tasks
 - **Face Detection**: Automatically detect faces in images using Haar cascades.
 - **Blur Faces**: Blur detected faces in images to protect privacy.
 - **Overlay Emojis**: Add emojis over detected faces in images.
+- **Emotion Detection**: Analyze faces to detect emotions like happiness, sadness, anger, and more.
 - **Save Images**: Save processed images to your preferred location.
 
 ## Requirements
@@ -26,7 +27,7 @@ A user-friendly Python application for performing various image processing tasks
 1. **Clone this repository**:
    ```bash
    git clone https://github.com/your-username/VisionX.git
-   cd enhanced-face-recognition
+   cd VisionX
    ```
 
 2. **Install dependencies**:
@@ -48,14 +49,14 @@ A user-friendly Python application for performing various image processing tasks
 
 2. Use the buttons in the GUI to:
    - Load images or open the camera feed.
-   - Process images using features like face detection, grayscale conversion, or emoji overlay.
+   - Process images using features like face detection, grayscale conversion, emoji overlay, or emotion detection.
    - Save processed images to your system.
 
 ## Folder Structure
 
 ```plaintext
-enhanced-face-recognition/
-├── enhanced_face_recognition.py  # Main application script
+VisionX/
+├── VisionX.py                    # Main application script
 ├── requirements.txt              # List of dependencies
 ├── README.md                     # Project documentation
 ```
