@@ -1,4 +1,7 @@
 import tkinter as tk
+# Import required libraries
+from keras.models import load_model
+import numpy as np
 from tkinter import filedialog, messagebox
 from datetime import datetime
 from PIL import Image, ImageTk
@@ -9,7 +12,7 @@ import os
 class EnhancedFaceRecognitionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Face Recognition App")
+        self.root.title("VisionX")
         self.root.geometry("800x600")
 
         # Fixed image display area
@@ -40,8 +43,11 @@ class EnhancedFaceRecognitionApp:
         emoji_overlay_button = tk.Button(btn_frame, text="Emoji Overlay", command=self.overlay_emojis, width=15)
         emoji_overlay_button.grid(row=1, column=1, padx=5, pady=5)
 
+        emotion_detection_button = tk.Button(btn_frame, text="Emotion Detection", command=self.emotion_detector, width=15)
+        emotion_detection_button.grid(row=1, column=2, padx=5, pady=5)
+        
         save_image_button = tk.Button(btn_frame, text="Save Image", command=self.save_image, width=15)
-        save_image_button.grid(row=1, column=2, padx=5, pady=5)
+        save_image_button.grid(row=1, column=3, padx=5, pady=5)
 
         # Placeholder for the loaded image and OpenCV image for processing
         self.loaded_image = None
@@ -77,9 +83,6 @@ class EnhancedFaceRecognitionApp:
         
         # Update current_image with the processed version
         self.current_image = cv_img.copy()
-
-
-
 
 
     def open_camera(self):
@@ -150,7 +153,8 @@ class EnhancedFaceRecognitionApp:
         
         gray_img = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
         gray_img_bgr = cv2.cvtColor(gray_img, cv2.COLOR_GRAY2BGR)
-        self.display_image(gray_img_bgr)
+        self.cv_image= gray_img_bgr
+        self.display_image(self.cv_image)
 
     def detect_faces(self):
         if self.cv_image is None:
@@ -217,6 +221,66 @@ class EnhancedFaceRecognitionApp:
         except Exception as e:
             messagebox.showerror("Error", f"Error in overlay_emojis: {str(e)}")
 
+    def emotion_detector(self):
+        if self.cv_image is None:
+            messagebox.showerror("Error", "No image loaded.")
+            return
+        
+        
+        # Load pre-trained emotion detection model
+        try:
+            # Ensure you have a pre-trained model file
+            model_path = 'emotion_model.h5'  # You'll need to provide this
+            emotion_model = load_model(model_path)
+            
+            # Emotion labels
+            emotions = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+            
+            # Load Haar Cascade for face detection (using existing method)
+            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+            
+            # Convert to grayscale for processing
+            gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
+            
+            # Detect faces
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            
+            # Create a copy of the image to draw on
+            img_with_emotions = self.cv_image.copy()
+            
+            for (x, y, w, h) in faces:
+                # Extract the face ROI
+                roi_gray = gray[y:y+h, x:x+w]
+                roi_gray = cv2.resize(roi_gray, (48, 48))  # Resize to match model's expected input
+                roi_gray = roi_gray.astype('float') / 255.0  # Normalize
+                roi_gray = np.expand_dims(roi_gray, axis=0)
+                roi_gray = np.expand_dims(roi_gray, axis=-1)
+                
+                # Predict emotion
+                preds = emotion_model.predict(roi_gray)
+                emotion_index = np.argmax(preds)
+                emotion = emotions[emotion_index]
+                confidence = preds[0][emotion_index]
+                
+                # Draw rectangle and emotion text
+                cv2.rectangle(img_with_emotions, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                label = f"{emotion}: {confidence:.2f}"
+                cv2.putText(img_with_emotions, label, 
+                            (x, y-10), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 
+                            0.9, (0, 255, 0), 2)
+            
+            # Display the image with emotion annotations
+            self.display_image(img_with_emotions)
+            
+            # If no faces detected
+            if len(faces) == 0:
+                messagebox.showinfo("Emotion Detection", "No faces detected in the image.")
+        
+        except FileNotFoundError:
+            messagebox.showerror("Error", "Emotion detection model not found. Please ensure 'emotion_model.h5' is in the correct directory.")
+        except Exception as e:
+            messagebox.showerror("Emotion Detection Error", str(e))
    
     def save_image(self):
         if self.cv_image is None:
