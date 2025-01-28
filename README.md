@@ -26,7 +26,7 @@ A user-friendly Python application for performing various image processing tasks
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/your-username/VisionX.git
+   git clone https://github.com/Seifeddine-bd/VisionX.git
    cd VisionX
    ```
 
