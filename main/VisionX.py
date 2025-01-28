@@ -14,7 +14,8 @@ class EnhancedFaceRecognitionApp:
         self.root = root
         self.root.title("VisionX")
         self.root.geometry("800x600")
-
+        icon_path = os.path.join(os.path.dirname(__file__), "visionX.ico")
+        self.root.iconbitmap(icon_path)
         # Fixed image display area
         self.image_frame = tk.Frame(self.root, width=500, height=500, bg="gray")
         self.image_frame.pack(side=tk.TOP, pady=20)
@@ -53,6 +54,8 @@ class EnhancedFaceRecognitionApp:
         self.loaded_image = None
         self.cv_image = None
         self.current_image = None  # Store the currently displayed image
+
+  
 
     def load_image(self):
         # Open file dialog to select an image
